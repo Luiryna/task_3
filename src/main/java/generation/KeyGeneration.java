@@ -1,7 +1,5 @@
 package generation;
 
-import org.apache.commons.codec.binary.Base64;
-
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import java.io.UnsupportedEncodingException;
@@ -26,6 +24,16 @@ public class KeyGeneration {
         Mac sha256 = Mac.getInstance("HmacSHA256");
         SecretKeySpec s_key = new SecretKeySpec(key.getBytes("UTF-8"), "HmacSHA256");
         sha256.init(s_key);
-        return Base64.encodeBase64String(sha256.doFinal(message.getBytes("UTF-8")));
+        byte[] bytes = sha256.doFinal(message.getBytes("ASCII"));
+
+        StringBuffer hash = new StringBuffer();
+        for (int i = 0; i < bytes.length; i++) {
+            String hex = Integer.toHexString(0xFF & bytes[i]);
+            if (hex.length() == 1) {
+                hash.append('0');
+            }
+            hash.append(hex);
+        }
+        return hash.toString();
     }
 }
